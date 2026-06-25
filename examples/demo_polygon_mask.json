@@ -17,6 +17,5 @@
     [550, 1160],
     [581, 1147]
   ],
-  "notes": "Production mask from the axolotl 720x1280 workflow. Smaller than a rectangle, but padded enough to cover the logo edges."
+  "notes": "Demo polygon mask for a 720x1280 generated video. Smaller than a rectangle, but padded enough to cover logo edges."
 }
-

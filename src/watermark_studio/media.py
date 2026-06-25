@@ -18,14 +18,17 @@ class VideoInfo:
 
 
 def run_command(args: list[str], cwd: Path | None = None, check: bool = True) -> subprocess.CompletedProcess[str]:
-    return subprocess.run(
+    result = subprocess.run(
         args,
         cwd=str(cwd) if cwd else None,
-        check=check,
         text=True,
         stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
+        stderr=subprocess.PIPE,
     )
+    if check and result.returncode != 0:
+        message = "\n".join((result.stderr or result.stdout or "").strip().splitlines()[-12:])
+        raise RuntimeError(f"Command failed ({result.returncode}): {' '.join(args)}\n{message}")
+    return result
 
 
 def _parse_fps(value: str) -> float:
@@ -69,7 +72,7 @@ def probe_video(path: Path) -> VideoInfo:
 def extract_frames(input_mp4: Path, frames_dir: Path) -> int:
     frames_dir.mkdir(parents=True, exist_ok=True)
     run_command(["ffmpeg", "-y", "-i", str(input_mp4), str(frames_dir / "%05d.png")])
-    return len(list(frames_dir.glob("*.png")))
+    return len(list(frames_dir.glob("[0-9][0-9][0-9][0-9][0-9].png")))
 
 
 def extract_preview_frame(input_mp4: Path, output_png: Path, at_seconds: float = 0.0) -> None:
@@ -110,4 +113,3 @@ def encode_video_from_frames(frames_dir: Path, input_mp4: Path, output_mp4: Path
         args += ["-c:a", "aac"]
     args += ["-shortest", str(output_mp4)]
     run_command(args)
-

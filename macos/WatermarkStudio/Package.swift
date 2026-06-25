@@ -11,7 +11,10 @@ let package = Package(
         .executable(name: "WatermarkStudioMac", targets: ["WatermarkStudioMac"])
     ],
     targets: [
-        .executableTarget(name: "WatermarkStudioMac")
+        .executableTarget(name: "WatermarkStudioMac"),
+        .testTarget(
+            name: "WatermarkStudioMacTests",
+            dependencies: ["WatermarkStudioMac"]
+        )
     ]
 )
-
