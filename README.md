@@ -106,7 +106,8 @@ Current app features:
 - Open a video.
 - Extract and show the first frame.
 - Drag a rectangle over the watermark.
-- Adjust mask expansion and segment length.
+- Adjust mask expansion.
+- Choose `Fast`, `Balanced`, or `Quality` cleanup presets.
 - Configure ProPainter path, Python path, and output path.
 - Run the CLI and stream progress logs.
 
@@ -119,6 +120,16 @@ The app uses the local Python package through `PYTHONPATH`, so it is easy to dev
 - Add batch mode from the macOS app.
 - Package a signed `.app` and optional bundled Python environment.
 - Add visual QC contact sheet generation after every run.
+
+## Speed Presets
+
+The macOS app exposes three ProPainter presets:
+
+- `Fast`: fewer RAFT iterations and a longer reference stride. Good for first-pass checks.
+- `Balanced`: the tested production setting from the Axolotl workflow.
+- `Quality`: slower and more conservative when the repaired area has foreground motion.
+
+For maximum speed, use the smallest accurate mask. Oversized masks are slower and usually smear more detail.
 
 ## Ethics And Scope
 

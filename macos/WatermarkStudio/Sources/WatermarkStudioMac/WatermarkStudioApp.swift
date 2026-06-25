@@ -41,6 +41,57 @@ struct WatermarkStudioApp {
     }
 }
 
+enum CleanupPreset: String, CaseIterable, Identifiable {
+    case fast = "Fast"
+    case balanced = "Balanced"
+    case quality = "Quality"
+
+    var id: String { rawValue }
+
+    var segmentFrames: Int {
+        switch self {
+        case .fast: 72
+        case .balanced: 48
+        case .quality: 36
+        }
+    }
+
+    var raftIter: Int {
+        switch self {
+        case .fast: 6
+        case .balanced: 10
+        case .quality: 14
+        }
+    }
+
+    var refStride: Int {
+        switch self {
+        case .fast: 15
+        case .balanced: 10
+        case .quality: 8
+        }
+    }
+
+    var subvideoLength: Int {
+        switch self {
+        case .fast: 12
+        case .balanced: 12
+        case .quality: 10
+        }
+    }
+
+    var description: String {
+        switch self {
+        case .fast:
+            "Faster first pass, slightly softer motion detail."
+        case .balanced:
+            "The tested Axolotl production setting."
+        case .quality:
+            "Slower, more conservative temporal repair."
+        }
+    }
+}
+
 struct ContentView: View {
     @State private var videoURL: URL?
     @State private var previewImage: NSImage?
@@ -50,7 +101,7 @@ struct ContentView: View {
     @State private var propainterPath = "/Users/haocongxing/Documents/kiddo enlish/tools/ProPainter"
     @State private var outputPath = ""
     @State private var expandPixels = 3.0
-    @State private var segmentFrames = 48.0
+    @State private var cleanupPreset: CleanupPreset = .balanced
     @State private var logText = "Ready"
     @State private var isRunning = false
 
@@ -122,7 +173,7 @@ struct ContentView: View {
             }
             .padding(.horizontal, 22)
 
-            ProgressTimeline(segmentFrames: Int(segmentFrames), isRunning: isRunning)
+            ProgressTimeline(segmentFrames: cleanupPreset.segmentFrames, isRunning: isRunning)
                 .padding(.horizontal, 22)
                 .padding(.bottom, 18)
         }
@@ -155,9 +206,21 @@ struct ContentView: View {
 
                 GroupBox("Backend") {
                     VStack(spacing: 10) {
+                        Picker("Speed", selection: $cleanupPreset) {
+                            ForEach(CleanupPreset.allCases) { preset in
+                                Text(preset.rawValue).tag(preset)
+                            }
+                        }
+                        .pickerStyle(.segmented)
+                        Text(cleanupPreset.description)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .frame(maxWidth: .infinity, alignment: .leading)
                         PathField(title: "Python", text: $pythonPath, canChooseDirectory: false)
                         PathField(title: "ProPainter", text: $propainterPath, canChooseDirectory: true)
-                        SliderRow(title: "Segment Length", value: $segmentFrames, range: 24...120, suffix: "frames")
+                        metricRow("Segment Length", "\(cleanupPreset.segmentFrames) frames")
+                        metricRow("RAFT Iter", "\(cleanupPreset.raftIter)")
+                        metricRow("Reference Stride", "\(cleanupPreset.refStride)")
                     }
                     .padding(.vertical, 4)
                 }
@@ -249,7 +312,7 @@ struct ContentView: View {
             outputPath = videoURL.deletingPathExtension().appendingPathExtension("cleaned.mp4").path
         }
         isRunning = true
-        logText = "Starting cleanup...\n"
+        logText = "Starting cleanup...\nPreset: \(cleanupPreset.rawValue)\n"
         let repoRoot = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent()
             .deletingLastPathComponent()
@@ -275,7 +338,13 @@ struct ContentView: View {
             "--expand",
             "\(Int(expandPixels))",
             "--segment-frames",
-            "\(Int(segmentFrames))",
+            "\(cleanupPreset.segmentFrames)",
+            "--raft-iter",
+            "\(cleanupPreset.raftIter)",
+            "--ref-stride",
+            "\(cleanupPreset.refStride)",
+            "--subvideo-length",
+            "\(cleanupPreset.subvideoLength)",
         ]
         process.environment = [
             "PYTHONPATH": repoRoot.appendingPathComponent("src").path,
