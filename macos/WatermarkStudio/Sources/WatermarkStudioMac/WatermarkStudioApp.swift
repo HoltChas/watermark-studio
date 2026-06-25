@@ -1,14 +1,43 @@
 import AVFoundation
 import SwiftUI
 
+final class AppDelegate: NSObject, NSApplicationDelegate {
+    private var window: NSWindow?
+
+    func applicationDidFinishLaunching(_ notification: Notification) {
+        let content = ContentView()
+            .frame(minWidth: 1120, minHeight: 760)
+
+        let window = NSWindow(
+            contentRect: NSRect(x: 0, y: 0, width: 1180, height: 800),
+            styleMask: [.titled, .closable, .miniaturizable, .resizable],
+            backing: .buffered,
+            defer: false
+        )
+        window.title = "Watermark Studio"
+        window.center()
+        window.contentView = NSHostingView(rootView: content)
+        window.makeKeyAndOrderFront(nil)
+        self.window = window
+        NSApp.activate(ignoringOtherApps: true)
+    }
+
+    func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
+        true
+    }
+}
+
 @main
-struct WatermarkStudioApp: App {
-    var body: some Scene {
-        WindowGroup {
-            ContentView()
-                .frame(minWidth: 1120, minHeight: 760)
-        }
-        .windowStyle(.titleBar)
+struct WatermarkStudioApp {
+    @MainActor
+    private static let appDelegate = AppDelegate()
+
+    @MainActor
+    static func main() {
+        let app = NSApplication.shared
+        app.delegate = appDelegate
+        app.setActivationPolicy(.regular)
+        app.run()
     }
 }
 
