@@ -29,6 +29,12 @@ The macOS app provides a visual workflow for opening a video, marking the cleanu
 
 ![Watermark Studio UI mockup](docs/assets/ui-mockup.png)
 
+## Before / After
+
+Left: source clip. Right: cleaned clip.
+
+![Watermark Studio before and after demo](docs/assets/demo-before-after.gif)
+
 ## Requirements
 
 - macOS or Linux for the CLI.
