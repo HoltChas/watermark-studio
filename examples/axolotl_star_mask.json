@@ -1,0 +1,22 @@
+{
+  "video_size": {
+    "width": 720,
+    "height": 1280
+  },
+  "mask_type": "polygon",
+  "expand": 3,
+  "points": [
+    [596, 1128],
+    [612, 1147],
+    [639, 1151],
+    [621, 1169],
+    [629, 1202],
+    [600, 1182],
+    [535, 1210],
+    [576, 1172],
+    [550, 1160],
+    [581, 1147]
+  ],
+  "notes": "Production mask from the axolotl 720x1280 workflow. Smaller than a rectangle, but padded enough to cover the logo edges."
+}
+

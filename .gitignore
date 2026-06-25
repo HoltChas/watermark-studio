@@ -1,0 +1,15 @@
+.DS_Store
+.build/
+.swiftpm/
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+dist/
+build/
+*.egg-info/
+work/
+outputs/
+*.mp4
+*.mov
+

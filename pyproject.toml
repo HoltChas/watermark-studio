@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "watermark-studio"
+version = "0.1.0"
+description = "A small toolkit and macOS app for marking and removing video watermarks with video inpainting backends."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Watermark Studio Contributors" }]
+dependencies = [
+  "opencv-python>=4.8",
+  "numpy>=1.24",
+]
+
+[project.scripts]
+watermark-studio = "watermark_studio.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
