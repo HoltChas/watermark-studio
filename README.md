@@ -2,22 +2,29 @@
 
 [中文说明](README.zh-CN.md)
 
-> Developer preview: the CLI and macOS app are usable for local workflows, but the macOS app is not signed or notarized yet.
+Watermark Studio is a developer-friendly toolkit for cleaning watermarks from videos you own or have permission to process. It combines a Python CLI, reusable masking/compositing utilities, a ProPainter backend adapter, and a native macOS app for visually marking the cleanup area.
 
-Watermark Studio is a practical video watermark cleanup toolkit. It helps you mark a watermark area, generate a fixed mask, run a video inpainting backend segment by segment, and rebuild the final video with the original audio.
+The workflow is simple: open a video, mark the watermark, run a video inpainting backend, and rebuild the final mp4 with the original audio preserved.
 
-Watermark Studio currently integrates [ProPainter](https://github.com/sczhou/ProPainter) as an external video inpainting backend. Point the CLI or macOS app at your local ProPainter checkout to run cleanup jobs.
+The current backend adapter targets [ProPainter](https://github.com/sczhou/ProPainter). Point the CLI or macOS app at a local ProPainter checkout to run cleanup jobs with that backend.
 
-## What This Repo Includes
+## Status
+
+Watermark Studio is currently a developer preview. The CLI and macOS app are usable for local workflows, but the macOS app is not signed or notarized yet.
+
+## Features
 
 - `watermark-studio` Python CLI.
-- Reusable Python modules for masks, ffmpeg/ffprobe media handling, ROI cropping, and segmented ProPainter runs.
-- A native macOS SwiftUI app for opening a video, marking a rectangle or pen/polygon mask, tuning parameters, and launching cleanup.
-- Example mask config, quickstart docs, CI, and contributor docs.
+- Rectangle and polygon mask generation.
+- ROI cropping and scaled repair compositing for faster ProPainter backend runs.
+- ffmpeg/ffprobe helpers for frame extraction and final mp4 rebuilds.
+- Native macOS SwiftUI app for visual marking, parameter tuning, and cleanup execution.
+- Environment diagnostics through `watermark-studio doctor`.
+- CI coverage for Python tests on macOS/Linux and Swift tests on macOS.
 
-## UI Direction
+## Interface Preview
 
-The first macOS interface direction is saved at:
+The macOS app provides a visual workflow for opening a video, marking the cleanup mask, previewing the mask, choosing speed/quality presets, and opening the completed output.
 
 ![Watermark Studio UI mockup](docs/assets/ui-mockup.png)
 
@@ -27,7 +34,7 @@ The first macOS interface direction is saved at:
 - macOS 14+ for the SwiftUI app.
 - `ffmpeg` and `ffprobe` on `PATH`.
 - Python 3.10+ with OpenCV and NumPy.
-- A working ProPainter checkout and environment.
+- A working ProPainter checkout and environment. Watermark Studio provides the orchestration layer; ProPainter code, weights, and runtime dependencies follow the upstream project.
 
 Check your local environment:
 
@@ -48,7 +55,7 @@ Recommended ProPainter flags for short generated-video clips:
 --save_frames
 ```
 
-Important note: ProPainter's own temporary mp4 writing can fail in some PyAV environments, while the repaired frames are already saved. This toolkit treats saved frames as the source of truth and uses ffmpeg to rebuild the final mp4.
+ProPainter's own temporary mp4 writing can fail in some PyAV environments while the repaired frames are already saved. Watermark Studio treats saved frames as the source of truth and uses ffmpeg to rebuild the final mp4.
 
 ## Install CLI For Development
 

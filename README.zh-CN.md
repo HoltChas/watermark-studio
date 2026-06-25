@@ -2,22 +2,29 @@
 
 [English README](README.md)
 
-> 开发预览版：CLI 和 macOS 应用已经可用于本地工作流，但 macOS 应用还没有签名和公证。
+Watermark Studio 是一个面向开发者和创作者的视频水印清理工具，用于处理你拥有版权、自己生成、已授权或有权限处理的视频。它包含 Python CLI、可复用的遮罩/合成工具、ProPainter 后端适配层，以及一个用于可视化标记水印区域的原生 macOS 应用。
 
-Watermark Studio 是一个实用的视频水印清理工具。它可以帮助你标记水印区域、生成固定遮罩、分段调用视频修复后端，并把修复后的画面重新合成为保留原音频的视频。
+典型流程很直接：打开视频，标记水印区域，调用视频修复后端分段处理，再把修复后的画面重新合成为保留原音频的 mp4。
 
-Watermark Studio 目前通过外部视频修复后端接入 [ProPainter](https://github.com/sczhou/ProPainter)。运行清理任务时，在 CLI 或 macOS 应用中选择本机 ProPainter checkout 路径即可。
+当前后端适配层面向 [ProPainter](https://github.com/sczhou/ProPainter)。运行清理任务时，在 CLI 或 macOS 应用中选择本机 ProPainter 项目目录即可。
 
-## 仓库内容
+## 项目状态
+
+Watermark Studio 目前是 developer preview。CLI 和 macOS 应用已经可用于本地工作流，但 macOS 应用还没有签名和公证。
+
+## 功能
 
 - `watermark-studio` Python 命令行工具。
-- 可复用的 Python 模块：遮罩、ffmpeg/ffprobe 媒体处理、ROI 裁剪、ProPainter 分段处理。
-- 原生 macOS SwiftUI 应用：打开视频、标记方框或钢笔/多边形遮罩、调整参数、启动清理。
-- 示例遮罩、快速开始文档、CI 和开源协作文档。
+- 支持矩形和多边形遮罩。
+- 支持 ROI 裁剪和缩放修复后合成回原视频，加快 ProPainter 后端处理。
+- 提供 ffmpeg/ffprobe 工具封装，用于抽帧和重建最终 mp4。
+- 提供原生 macOS SwiftUI 应用，用于可视化标记、参数调整和启动清理。
+- 提供 `watermark-studio doctor` 环境诊断命令。
+- CI 覆盖 macOS/Linux Python 测试和 macOS Swift 测试。
 
-## 界面方向
+## 界面预览
 
-第一版 macOS 界面方向如下：
+macOS 应用提供可视化工作流：打开视频、标记清理遮罩、预览遮罩、选择速度/质量预设，并打开完成后的输出视频。
 
 ![Watermark Studio UI mockup](docs/assets/ui-mockup.png)
 
@@ -27,7 +34,7 @@ Watermark Studio 目前通过外部视频修复后端接入 [ProPainter](https:/
 - SwiftUI app 需要 macOS 14+。
 - `ffmpeg` 和 `ffprobe` 需要在 `PATH` 中。
 - Python 3.10+，并安装 OpenCV 和 NumPy。
-- 本机需要有可运行的 ProPainter checkout 和对应环境。
+- 本机需要有可运行的 ProPainter 项目目录和对应环境。Watermark Studio 提供调度和合成层；ProPainter 代码、权重和运行依赖遵循上游项目。
 
 检查本机环境：
 
@@ -48,7 +55,7 @@ watermark-studio doctor \
 --save_frames
 ```
 
-注意：某些 PyAV 环境里，ProPainter 自己写临时 mp4 可能失败，但修复后的帧其实已经保存好了。本工具把保存的帧当作事实来源，再用 ffmpeg 重新合成最终 mp4。
+某些 PyAV 环境里，ProPainter 自己写临时 mp4 可能失败，但修复后的帧其实已经保存好了。Watermark Studio 把保存的帧当作事实来源，再用 ffmpeg 重新合成最终 mp4。
 
 ## 安装开发版 CLI
 
