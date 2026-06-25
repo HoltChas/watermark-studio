@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "watermark-studio"
 version = "0.1.0"
-description = "A small toolkit and macOS app for marking and removing video watermarks with video inpainting backends."
+description = "Remove Veo, Gemini, and AI-generated video watermarks with a Python CLI, macOS app, and video inpainting backend adapter."
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }

@@ -8,6 +8,12 @@ Watermark Studio 是一个面向开发者和创作者的视频水印清理工具
 
 当前后端适配层面向 [ProPainter](https://github.com/sczhou/ProPainter)。运行清理任务时，在 CLI 或 macOS 应用中选择本机 ProPainter 项目目录即可。
 
+## 适用场景
+
+- 清理你拥有或有权限处理的 Veo、Gemini 等 AI 生成视频水印。
+- 对小型生成视频标记比较矩形遮罩和多边形遮罩效果。
+- 通过 Python CLI 或原生 macOS GUI 在本地执行视频修复清理。
+
 ## 项目状态
 
 Watermark Studio 目前是 developer preview。CLI 和 macOS 应用已经可用于本地工作流，但 macOS 应用还没有签名和公证。

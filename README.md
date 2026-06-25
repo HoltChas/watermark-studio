@@ -8,6 +8,12 @@ The workflow is simple: open a video, mark the watermark, run a video inpainting
 
 The current backend adapter targets [ProPainter](https://github.com/sczhou/ProPainter). Point the CLI or macOS app at a local ProPainter checkout to run cleanup jobs with that backend.
 
+## Use Cases
+
+- Remove watermarks from Veo, Gemini, and other AI-generated video clips you own or have permission to process.
+- Compare rectangle and polygon masks for small generated-video logos.
+- Run local video inpainting cleanup from a Python CLI or a native macOS GUI.
+
 ## Status
 
 Watermark Studio is currently a developer preview. The CLI and macOS app are usable for local workflows, but the macOS app is not signed or notarized yet.
