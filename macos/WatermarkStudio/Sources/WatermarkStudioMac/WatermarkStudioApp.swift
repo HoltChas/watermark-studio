@@ -103,15 +103,21 @@ struct ContentView: View {
                     MarkableVideoView(image: previewImage, selection: $selection)
                         .padding(18)
                 } else {
-                    VStack(spacing: 12) {
-                        Image(systemName: "video.badge.plus")
-                            .font(.system(size: 44))
-                            .foregroundStyle(.teal)
-                        Text("Open Video")
-                            .font(.title3.weight(.semibold))
-                        Text("The first frame appears here. Drag the selection box to cover the watermark.")
-                            .foregroundStyle(.secondary)
+                    Button(action: openVideo) {
+                        VStack(spacing: 12) {
+                            Image(systemName: "video.badge.plus")
+                                .font(.system(size: 44))
+                                .foregroundStyle(.teal)
+                            Text("Open Video")
+                                .font(.title3.weight(.semibold))
+                                .foregroundStyle(.primary)
+                            Text("The first frame appears here. Drag the selection box to cover the watermark.")
+                                .foregroundStyle(.secondary)
+                        }
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .contentShape(Rectangle())
                     }
+                    .buttonStyle(.plain)
                 }
             }
             .padding(.horizontal, 22)
