@@ -20,6 +20,7 @@ Watermark Studio is currently a developer preview. The CLI and macOS app are usa
 - ffmpeg/ffprobe helpers for frame extraction and final mp4 rebuilds.
 - Native macOS SwiftUI app for visual marking, parameter tuning, and cleanup execution.
 - Environment diagnostics through `watermark-studio doctor`.
+- ProPainter bootstrap script for cloning/updating the backend checkout.
 - CI coverage for Python tests on macOS/Linux and Swift tests on macOS.
 
 ## Interface Preview
@@ -43,6 +44,17 @@ watermark-studio doctor \
   --python python3 \
   --propainter-dir /path/to/ProPainter
 ```
+
+Bootstrap a local ProPainter checkout:
+
+```bash
+scripts/bootstrap_propainter.sh ~/Tools/ProPainter
+watermark-studio doctor \
+  --python ~/Tools/ProPainter/.venv/bin/python \
+  --propainter-dir ~/Tools/ProPainter
+```
+
+Set `INSTALL_REQUIREMENTS=1` if you want the bootstrap script to run `pip install -r requirements.txt` inside the generated virtual environment.
 
 Recommended ProPainter flags for short generated-video clips:
 
@@ -171,7 +183,7 @@ For maximum speed, use the smallest accurate mask. Oversized masks are slower an
 
 ## Suggested GitHub Roadmap
 
-- Add backend presets for ProPainter, OpenCV Telea, and LaMa/other image inpainting.
+- Add additional backend adapters for OpenCV Telea, LaMa, and other image/video inpainting engines.
 - Add batch mode from the macOS app.
 - Package a signed `.app` and optional bundled Python environment.
 - Add visual QC contact sheet generation after every run.

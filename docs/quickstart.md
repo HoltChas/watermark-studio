@@ -18,14 +18,20 @@ cd /path/to/watermark-studio
 python3 -m pip install -e .
 ```
 
-Install and test ProPainter separately. Watermark Studio does not vendor ProPainter, its model weights, or its Python environment.
+Bootstrap a local ProPainter checkout:
+
+```bash
+scripts/bootstrap_propainter.sh ~/Tools/ProPainter
+```
+
+By default, the script clones or updates ProPainter and creates `~/Tools/ProPainter/.venv`. Set `INSTALL_REQUIREMENTS=1` if you also want it to run `pip install -r requirements.txt` inside that virtual environment.
 
 ## 2. Check The Environment
 
 ```bash
 watermark-studio doctor \
-  --python python3 \
-  --propainter-dir /path/to/ProPainter
+  --python ~/Tools/ProPainter/.venv/bin/python \
+  --propainter-dir ~/Tools/ProPainter
 ```
 
 Every line should be `OK`. Fix any `FAIL` before running cleanup.
