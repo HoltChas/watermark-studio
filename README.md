@@ -6,7 +6,7 @@
 
 Watermark Studio is a practical video watermark cleanup toolkit. It helps you mark a watermark area, generate a fixed mask, run a video inpainting backend segment by segment, and rebuild the final video with the original audio.
 
-The first backend target is [ProPainter](https://github.com/sczhou/ProPainter). Install ProPainter separately and pass its local path to the CLI or macOS app.
+Watermark Studio currently integrates [ProPainter](https://github.com/sczhou/ProPainter) as an external video inpainting backend. Point the CLI or macOS app at your local ProPainter checkout to run cleanup jobs.
 
 ## What This Repo Includes
 

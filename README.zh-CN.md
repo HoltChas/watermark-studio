@@ -6,7 +6,7 @@
 
 Watermark Studio 是一个实用的视频水印清理工具。它可以帮助你标记水印区域、生成固定遮罩、分段调用视频修复后端，并把修复后的画面重新合成为保留原音频的视频。
 
-当前第一个后端目标是 [ProPainter](https://github.com/sczhou/ProPainter)。请单独安装 ProPainter，并在 CLI 或 macOS 应用里配置本机路径。
+Watermark Studio 目前通过外部视频修复后端接入 [ProPainter](https://github.com/sczhou/ProPainter)。运行清理任务时，在 CLI 或 macOS 应用中选择本机 ProPainter checkout 路径即可。
 
 ## 仓库内容
 
