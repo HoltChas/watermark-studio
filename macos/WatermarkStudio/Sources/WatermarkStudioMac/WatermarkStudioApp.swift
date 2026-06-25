@@ -80,10 +80,18 @@ enum CleanupPreset: String, CaseIterable, Identifiable {
         }
     }
 
+    var processScale: Double {
+        switch self {
+        case .fast: 0.5
+        case .balanced: 1.0
+        case .quality: 1.0
+        }
+    }
+
     var description: String {
         switch self {
         case .fast:
-            "Faster first pass, slightly softer motion detail."
+            "Half-resolution repair, pasted back only inside the marked mask."
         case .balanced:
             "The tested Axolotl production setting."
         case .quality:
@@ -219,6 +227,7 @@ struct ContentView: View {
                         PathField(title: "Python", text: $pythonPath, canChooseDirectory: false)
                         PathField(title: "ProPainter", text: $propainterPath, canChooseDirectory: true)
                         metricRow("Segment Length", "\(cleanupPreset.segmentFrames) frames")
+                        metricRow("Process Scale", "\(cleanupPreset.processScale.formatted(.number.precision(.fractionLength(1))))x")
                         metricRow("RAFT Iter", "\(cleanupPreset.raftIter)")
                         metricRow("Reference Stride", "\(cleanupPreset.refStride)")
                     }
@@ -345,6 +354,10 @@ struct ContentView: View {
             "\(cleanupPreset.refStride)",
             "--subvideo-length",
             "\(cleanupPreset.subvideoLength)",
+            "--process-scale",
+            "\(cleanupPreset.processScale)",
+            "--composite-feather",
+            "2",
         ]
         process.environment = [
             "PYTHONPATH": repoRoot.appendingPathComponent("src").path,

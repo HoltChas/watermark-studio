@@ -125,7 +125,7 @@ The app uses the local Python package through `PYTHONPATH`, so it is easy to dev
 
 The macOS app exposes three ProPainter presets:
 
-- `Fast`: fewer RAFT iterations and a longer reference stride. Good for first-pass checks.
+- `Fast`: half-resolution inpainting composited back into the marked mask region. Good for first-pass checks.
 - `Balanced`: the tested production setting from the Axolotl workflow.
 - `Quality`: slower and more conservative when the repaired area has foreground motion.
 

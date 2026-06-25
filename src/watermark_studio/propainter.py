@@ -22,6 +22,8 @@ class ProPainterOptions:
     subvideo_length: int = 12
     raft_iter: int = 10
     mask_dilation: int = 0
+    process_scale: float = 1.0
+    composite_feather: int = 2
     keep_work: bool = False
 
 
@@ -40,22 +42,33 @@ def clean_video(
         )
     if options.segment_frames <= 0:
         raise ValueError("segment_frames must be positive.")
+    if not (0 < options.process_scale <= 1):
+        raise ValueError("process_scale must be > 0 and <= 1.")
 
     if work_dir.exists():
         shutil.rmtree(work_dir)
     frames_full = work_dir / "frames_full"
+    process_frames_full = work_dir / "process_frames_full"
     final_frames = work_dir / "final_frames"
     segments = work_dir / "segments"
     frames_full.mkdir(parents=True, exist_ok=True)
+    process_frames_full.mkdir(parents=True, exist_ok=True)
     final_frames.mkdir(parents=True, exist_ok=True)
 
     total_frames = extract_frames(input_mp4, frames_full)
     if total_frames <= 0:
         raise RuntimeError(f"No frames extracted from {input_mp4}")
 
+    process_width = _even_dimension(round(info.width * options.process_scale))
+    process_height = _even_dimension(round(info.height * options.process_scale))
+
     mask = mask_spec.render()
+    process_mask = cv2.resize(mask, (process_width, process_height), interpolation=cv2.INTER_NEAREST)
+    alpha = _mask_alpha(mask, options.composite_feather)
     mask_path = work_dir / "mask_preview.png"
     cv2.imwrite(str(mask_path), mask)
+    cv2.imwrite(str(work_dir / "process_mask_preview.png"), process_mask)
+    _write_process_frames(frames_full, process_frames_full, total_frames, process_width, process_height)
 
     global_out = 0
     segment_index = 0
@@ -73,8 +86,8 @@ def clean_video(
         seg_masks.mkdir(parents=True, exist_ok=True)
 
         for local, src in enumerate(range(start, end + 1), start=1):
-            shutil.copy2(frames_full / f"{src:05d}.png", seg_frames / f"{local:05d}.png")
-            cv2.imwrite(str(seg_masks / f"{local - 1:05d}.png"), mask)
+            shutil.copy2(process_frames_full / f"{src:05d}.png", seg_frames / f"{local:05d}.png")
+            cv2.imwrite(str(seg_masks / f"{local - 1:05d}.png"), process_mask)
 
         args = [
             options.python,
@@ -86,9 +99,9 @@ def clean_video(
             "--output",
             str(seg_out),
             "--height",
-            str(info.height),
+            str(process_height),
             "--width",
-            str(info.width),
+            str(process_width),
             "--mask_dilation",
             str(options.mask_dilation),
             "--neighbor_length",
@@ -123,7 +136,13 @@ def clean_video(
             )
 
         for local_out in range(count):
-            shutil.copy2(out_frames_dir / f"{local_out:04d}.png", final_frames / f"{global_out:04d}.png")
+            source_frame = frames_full / f"{start + local_out:05d}.png"
+            repaired_frame = out_frames_dir / f"{local_out:04d}.png"
+            final_frame = final_frames / f"{global_out:04d}.png"
+            if options.process_scale < 0.999:
+                _composite_repaired_region(source_frame, repaired_frame, final_frame, mask, alpha, info.width, info.height)
+            else:
+                shutil.copy2(repaired_frame, final_frame)
             global_out += 1
         segment_index += 1
 
@@ -131,3 +150,52 @@ def clean_video(
     if not options.keep_work:
         shutil.rmtree(work_dir, ignore_errors=True)
 
+
+def _even_dimension(value: int) -> int:
+    value = max(value, 2)
+    return value if value % 2 == 0 else value - 1
+
+
+def _write_process_frames(source_dir: Path, out_dir: Path, total_frames: int, width: int, height: int) -> None:
+    for index in range(1, total_frames + 1):
+        source_path = source_dir / f"{index:05d}.png"
+        frame = cv2.imread(str(source_path), cv2.IMREAD_COLOR)
+        if frame is None:
+            raise RuntimeError(f"Could not read frame: {source_path}")
+        resized = cv2.resize(frame, (width, height), interpolation=cv2.INTER_AREA)
+        ok = cv2.imwrite(str(out_dir / f"{index:05d}.png"), resized)
+        if not ok:
+            raise RuntimeError(f"Could not write resized frame: {out_dir / f'{index:05d}.png'}")
+
+
+def _mask_alpha(mask: cv2.typing.MatLike, feather: int) -> cv2.typing.MatLike:
+    alpha = mask.astype("float32") / 255.0
+    if feather > 0:
+        kernel = feather * 2 + 1
+        alpha = cv2.GaussianBlur(alpha, (kernel, kernel), 0)
+    return alpha[:, :, None]
+
+
+def _composite_repaired_region(
+    original_path: Path,
+    repaired_path: Path,
+    output_path: Path,
+    mask: cv2.typing.MatLike,
+    alpha: cv2.typing.MatLike,
+    width: int,
+    height: int,
+) -> None:
+    original = cv2.imread(str(original_path), cv2.IMREAD_COLOR)
+    repaired = cv2.imread(str(repaired_path), cv2.IMREAD_COLOR)
+    if original is None:
+        raise RuntimeError(f"Could not read original frame: {original_path}")
+    if repaired is None:
+        raise RuntimeError(f"Could not read repaired frame: {repaired_path}")
+    repaired_full = cv2.resize(repaired, (width, height), interpolation=cv2.INTER_CUBIC)
+    blended = (repaired_full.astype("float32") * alpha) + (original.astype("float32") * (1.0 - alpha))
+    out = blended.clip(0, 255).astype("uint8")
+    # Preserve fully unmasked pixels byte-for-byte after feathering math.
+    out[mask == 0] = original[mask == 0]
+    ok = cv2.imwrite(str(output_path), out)
+    if not ok:
+        raise RuntimeError(f"Could not write final frame: {output_path}")

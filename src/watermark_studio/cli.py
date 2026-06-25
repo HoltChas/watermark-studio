@@ -46,11 +46,14 @@ def cmd_clean(args: argparse.Namespace) -> int:
         subvideo_length=args.subvideo_length,
         raft_iter=args.raft_iter,
         mask_dilation=args.mask_dilation,
+        process_scale=args.process_scale,
+        composite_feather=args.composite_feather,
         keep_work=args.keep_work,
     )
     print(f"input={input_mp4}")
     print(f"output={output_mp4}")
     print(f"video={info.width}x{info.height} fps={info.fps:g} frames={info.frame_count}")
+    print(f"process_scale={options.process_scale:g}")
     print(f"work_dir={work_dir}")
 
     def progress(segment: int, start: int, end: int, total: int) -> None:
@@ -89,6 +92,8 @@ def make_parser() -> argparse.ArgumentParser:
     clean.add_argument("--subvideo-length", type=int, default=12)
     clean.add_argument("--raft-iter", type=int, default=10)
     clean.add_argument("--mask-dilation", type=int, default=0)
+    clean.add_argument("--process-scale", type=float, default=1.0, help="Run inpainting at this scale and composite the repaired mask region back onto the original frames.")
+    clean.add_argument("--composite-feather", type=int, default=2, help="Feather mask edges when compositing scaled repairs back to full resolution.")
     clean.add_argument("--work-dir")
     clean.add_argument("--keep-work", action="store_true")
     clean.set_defaults(func=cmd_clean)
@@ -103,4 +108,3 @@ def main(argv: list[str] | None = None) -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-
